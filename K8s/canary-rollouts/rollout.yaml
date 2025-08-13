@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: myapp-canary
+  namespace: zero-downtime
+spec:
+  replicas: 4
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: myapp-canary
+  template:
+    metadata:
+      labels:
+        app: myapp-canary
+    spec:
+      terminationGracePeriodSeconds: 15
+      containers:
+        - name: app
+          image: nakib200108/zero-downtime:v1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: VERSION
+              value: "v1"
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 5"]
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            periodSeconds: 2
+            initialDelaySeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+
+  strategy:
+    canary:
+      canaryService: myapp-canary-svc     # single Service; weight is simulated by RS replicas
+      steps:
+        - setWeight: 20
+        - pause: {duration: 20}
+        - setWeight: 50
+        - pause: {duration: 20}
+        - setWeight: 100
