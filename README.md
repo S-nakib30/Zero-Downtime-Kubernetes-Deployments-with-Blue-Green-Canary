@@ -70,4 +70,4 @@ o Push a new version to Docker Hub as latest.
 
 o Update the deployment and observe the update behavior.
 rollout screenshot : 
-![successfull rollout]()
+![successfull rollout](https://github.com/S-nakib30/Zero-Downtime-Kubernetes-Deployments-with-Blue-Green-Canary/blob/c14d341d5e438530624c9a665978f05a4953458c/successfull%20rollout..png)
